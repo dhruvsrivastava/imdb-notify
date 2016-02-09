@@ -1,8 +1,12 @@
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
+from flask import Flask , render_template
+
+app = Flask(__name__)
 
 import sqlite3
 
+@app.route('/series')
 def series():
 	url = urlopen("http://www.imdb.com/chart/toptv/?ref_=nv_tvv_250_3")
 	soup = BeautifulSoup(url)
@@ -20,9 +24,9 @@ def series():
 		cur = c.execute("""SELECT * from series """ )
 		all_names = [dict(title=row[0], rating=row[1]) for row in cur.fetchall()]
 
-		print "currently in database"
-		for i in range(len(all_names)):
-			print all_names[i]['title']
+		# print "currently in database"
+		# for i in range(len(all_names)):
+		# 	print all_names[i]['title']
 
 		for i in range(len(name)):
 			show_name = name[i]
@@ -37,7 +41,9 @@ def series():
 				print name[i],
 				print rating[i]
 				c.execute("INSERT INTO series VALUES(? , ?)", (name[i] , rating[i]) )
+	return "series"
 
+@app.route('/movies')
 def movies():
 	url = urlopen("http://www.imdb.com/chart/top?ref_=nv_mv_250_6")
 	soup = BeautifulSoup(url)
@@ -55,9 +61,9 @@ def movies():
 		cur = c.execute("""SELECT * from movies """ )
 		all_names = [dict(title=row[0], rating=row[1]) for row in cur.fetchall()]
 
-		print "currently in database"
-		for i in range(len(all_names)):
-			print all_names[i]['title']
+		# print "currently in database"
+		# for i in range(len(all_names)):
+		# 	print all_names[i]['title']
 
 		for i in range(len(name)):
 			show_name = name[i]
@@ -72,10 +78,17 @@ def movies():
 				print name[i],
 				print rating[i]
 				c.execute("INSERT INTO movies VALUES(? , ?)", (name[i] , rating[i]) )
+	return "movies"
+
+@app.route('/')
+def welcome():
+    return render_template('welcome.html')  # render a template
+
 
 if __name__ == '__main__':
-	series()
-	movies()
+	app.run(debug = True)
+	# series()
+	# movies()
 # database = connect_db()
 # c = database.cursor()
 # for i in range(10):

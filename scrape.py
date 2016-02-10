@@ -1,10 +1,31 @@
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from flask import Flask , render_template
-
+from flask import abort
 app = Flask(__name__)
 
 import sqlite3
+
+#exception error handler
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.route('/users/<username>')
+def users(username):
+	if username == "dhruv":
+		return "<h1> Hello " + username  + "</h1>"
+	abort(404)
+
+
+@app.route('/seen')
+def seen():
+	with sqlite3.connect('imdb.db') as connection:
+		c = connection.cursor()
+		cur = c.execute(' SELECT * from movies ')
+		all_movies = [dict(title = row[0] , rating = row[1]) for row in cur.fetchall()]
+		return render_template('seen.html' , all_movies = all_movies)
 
 @app.route('/series')
 def series():

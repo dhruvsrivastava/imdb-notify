@@ -2,7 +2,12 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from flask import Flask , render_template
 from flask import abort
+from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
 
 import sqlite3
 

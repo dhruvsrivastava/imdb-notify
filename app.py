@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+# db = SQLAlchemy(app)
 
 import sqlite3
 
@@ -16,6 +16,10 @@ import sqlite3
 def page_not_found(e):
     return render_template('404.html'), 404
 
+#add personalised watchlist for each user
+@app.route('/watchlist/<username>')
+def watchlist(username):
+	return render_template('watchlist.html' , username = username)
 
 @app.route('/users/<username>')
 def users(username):
@@ -23,6 +27,13 @@ def users(username):
 		return "<h1> Hello " + username  + "</h1>"
 	abort(404)
 
+@app.route('/new')
+def new():
+	with sqlite3.connect('imdb.db') as connection:
+		c = connection.cursor()
+		cur = c.execute(' SELECT * from movies ')
+		all_movies = [dict(title = row[0] , rating = row[1]) for row in cur.fetchall()]  
+		return render_template('new.html' , all_movies = all_movies)
 
 @app.route('/seen')
 def seen():
@@ -90,7 +101,7 @@ def movies():
 		# print "currently in database"
 		# for i in range(len(all_names)):
 		# 	print all_names[i]['title']
-
+		new_movies = []
 		for i in range(len(name)):
 			show_name = name[i]
 
@@ -100,11 +111,12 @@ def movies():
 					found = True
 					break
 			if not found:
+				new_movies.append(name[i])
 				print "New movie in top 250"
 				print name[i],
 				print rating[i]
 				c.execute("INSERT INTO movies VALUES(? , ?)", (name[i] , rating[i]) )
-	return "movies"
+	return render_template('new.html' , new_movies = new_movies)
 
 @app.route('/')
 def welcome():

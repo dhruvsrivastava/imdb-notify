@@ -27,6 +27,10 @@ def users(username):
 		return "<h1> Hello " + username  + "</h1>"
 	abort(404)
 
+@app.route('/about_me')
+def about_me():
+	return render_template('about_me.html')
+
 @app.route('/new')
 def new():
 	with sqlite3.connect('imdb.db') as connection:

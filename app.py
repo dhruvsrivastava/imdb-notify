@@ -3,11 +3,12 @@ from urllib2 import urlopen
 from flask import Flask , render_template
 from flask import abort
 from flask.ext.sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
-db = SQLAlchemy(app)
+#config
+app.config.from_object(os.environ['APP_SETTINGS'])
 
 # import sqlite3
 
@@ -128,7 +129,7 @@ def welcome():
 
 
 if __name__ == '__main__':
-	app.run(debug = True)
+	app.run()
 	# series()
 	# movies()
 # database = connect_db()
